@@ -28,17 +28,6 @@ namespace fs = std::filesystem;
 
 //========================================================================================
 
-/*Returns boolean if given string is valid windows directory
-    ACCEPTS:
-        C:\
-        C:\Users
-        C:\Users\Me\Documents\
-
-    DECLINES:
-        Users\Me
-        C:\Us*ers
-        C:\\Users
- */
 static bool is_windows_directory(const string& path)
 {
     //SOURCE: https://quickref.me/regex.html
@@ -51,7 +40,6 @@ static bool is_windows_directory(const string& path)
     return true;
 }
 
-//Returns bool depending on if the path given is an existing one on the computer
 static bool is_exsisting_directory(const string& validPath)
 {
     cout << "\n=======================================================\n";
@@ -72,7 +60,6 @@ static bool is_exsisting_directory(const string& validPath)
     return false;
 }
 
-//Loops though requesting user for a valid dictionary path
 static string get_valid_directory()
 {
     bool userInputValid = false;
@@ -97,8 +84,6 @@ static string get_valid_directory()
 }
 
 //========================================================================================
-//Correct input/output: 'output.html','CppFile.html','Hello.html'
-//Incorrect input: '.html', '$%#.html', '14.html'
 static bool is_html_string(const string& fileName)
 {
     //SOURCE https://stackoverflow.com/questions/6768779/test-filename-with-regular-expression
@@ -121,8 +106,6 @@ static bool is_existing_html(const string& fileName, const string& directory)
     return false;
 }
 
-//returns valid windows file name for an html file given by user
-//returns false if not valid name or inputs name of a file that already exist in chosen directory
 static string get_html_name(string chosenDirectory)
 {
     bool userInputValid = false;
@@ -170,27 +153,22 @@ static const char* describe_upload_result(UploadResult result)
     }
 }
 
-// 5) Outputs the modified file as an html file
 static UploadResult upload_string_as_html(const string& htmlString, const string& fileName, const string& dirPath)
 {
     fs::path fullPath = fs::path(dirPath) / fileName;
 
-    //Creates and opens file using 'fullPath'
     ofstream writingFile(fullPath);
     if (!writingFile) { return UploadResult::OpenFailed; }
 
-    //writes htmlString to opened file
     writingFile << htmlString << endl;
     if (writingFile.fail()) { return UploadResult::WriteFailed; }
 
-    //Closes file
     writingFile.close();
     if (writingFile.fail()) { return UploadResult::CloseFailed; }
 
     return UploadResult::Success;
 }
 
-//Adds opening and closing "<PRE>" tags and html metadata to string
 static string prep_string_as_html(const string& body, const string& fileName)
 {
     return "<!DOCTYPE html>\n<html>\n<head>\n<title>" + fileName +
@@ -198,30 +176,24 @@ static string prep_string_as_html(const string& body, const string& fileName)
         body + "</PRE>\n</body>\n</html>\n";
 }
 
-//Replaces the "<" and ">" symbol
 static string alter_cpp_for_html(ifstream& file)
 {
     string line, result;
-    //Loops through each line
     while (getline(file, line))
     {
-        //checks each character in line and adds
         for (const char c : line)
         {
             if (c == '<') result += "&lt;";
             else if (c == '>') result += "&gt;";
             else result += c;
         }
-        //Maintains each line
         result += '\n';
     }
     return result;
 }
 
-//Get file from directory
 static ifstream get_file(const string& readFilePath)
 {
-    //Error handling for reading file
     ifstream readFile(readFilePath);
     if (!readFile.is_open())
     {
