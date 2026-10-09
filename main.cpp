@@ -18,11 +18,10 @@
 // 4) Verifies html file name: DONE
 // 5) uses fin.fail and fout.fail: DONE
 // 6) properly formats Html heading for display reasons: DONE
-// 7) Asks user for name of CPP file being read: I was too tierd
+// 7) Asks user for name of CPP file being read
 // 8) Creates html file in specified directory: DONE
 // 9) Makes sure there is no file with same name: DONE
 
-//Upload string as HTML in given directory, returns error code
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -39,43 +38,28 @@ namespace fs = std::filesystem;
         C:\Us*ers
         C:\\Users
  */
-static bool is_windows_dir(const std::string& path)
+static bool is_windows_directory(const string& path)
 {
     static const regex windowsDirRegex(
         R"re(^[a-zA-Z]:\\(?:[^\\/:*?"<>|]+\\)*[^\\/:*?"<>|]*$)re"
     );
-    //Early Return
-    try
-    {
-        if (path == "") { throw invalid_argument("path is empty"); }
-
-        if (path.length() >= 260) { throw invalid_argument("path is too long"); };
-    }
-    catch (invalid_argument& e)
-    {
-        cout << "Invalid argument: " << e.what() << endl;
-        return false;
-    }
-
-    try
-    {
-        if (!regex_match(path, windowsDirRegex)) { throw invalid_argument("path is not a directory"); }
-        return true;
-    }
-    catch (invalid_argument& e)
-    {
-        cout << "Invalid argument: " << e.what() << endl;
-        return false;
-    }
+    if (path.empty())          { cout << "Path is empty\n"; return false; }
+    if (path.length() >= 260)  { cout << "Path is too long\n"; return false; }
+    if (!regex_match(path, windowsDirRegex)) { cout << "Path is not a valid directory format\n"; return false; }
+    return true;
 }
 
 //Returns bool depending on if the path given is an existing one on the computer
 static bool is_exsisting_directory(const string& validPath)
 {
     cout << "\n=======================================================\n";
-    if (filesystem::exists(validPath) && filesystem::is_directory(validPath))
+
+    error_code ec;
+    bool dirExsist = fs::exists(validPath, ec) && fs::is_directory(validPath, ec);
+    if (ec) {cout << "File System Error: " << ec.message() << endl; return false; }
+    if (dirExsist)
     {
-        cout << "Directory exists: " << validPath << endl;
+        cout << "Directory exists: '" << validPath << "'\n";
         return true;
     }
     cout << "'" << validPath << "' is not an existing directory, Try again" << endl;
@@ -86,7 +70,6 @@ static bool is_exsisting_directory(const string& validPath)
 static string get_valid_directory()
 {
     bool userInputValid = false;
-    bool validDirString = false;
     string userInput;
 
     while (!userInputValid)
@@ -98,7 +81,7 @@ static string get_valid_directory()
             "\n - \t C:\\users\\me\\documents\n";
         cout << "Please enter a valid directory: ";
         getline(cin, userInput);
-        if (is_windows_dir(userInput))
+        if (is_windows_directory(userInput))
         {
             cout << "checking if '" << userInput << "' exists " << endl;
             userInputValid = is_exsisting_directory(userInput);
@@ -118,7 +101,7 @@ static bool is_html_string(string fileName)
     {
         if (fileName == "") { throw invalid_argument("Name is empty"); }
 
-        if (fileName.length() >= 260) { throw invalid_argument("Name too long"); };
+        if (fileName.length() >= 250) { throw invalid_argument("Name too long"); };
     }
     catch (invalid_argument& e)
     {
@@ -154,7 +137,6 @@ static bool is_existing_html(const string& fileName, const string& directory)
 static string get_html_name(string chosenDirectory)
 {
     bool userInputValid = false;
-    bool validNameString = false;
     string userInput;
 
     while (!userInputValid)
@@ -190,19 +172,17 @@ static int upload_string_as_html(const string& htmlString, const string& fileNam
     ofstream outFile(fullPath);
     if (!outFile)
     {
-        cout << "Unable to open file for writing." << endl;
         return -1;
     }
     outFile << htmlString << endl;
     //Checks if the stream has failed (Failbit or bad)
     if (outFile.fail())
     {
-        cout << "Error writing to file or bad stream" << endl;
         return -1;
     }
     //Closes file
     outFile.close();
-    cout << "File uploaded successfully." << endl;
+    if (!outFile.fail()){ return -2;}
     return 0;
 }
 
@@ -210,7 +190,7 @@ static int upload_string_as_html(const string& htmlString, const string& fileNam
 static string prep_string_as_html(const string& body, const string& fileName)
 {
     return "<!DOCTYPE html>\n<html>\n<head>\n<title>" + fileName +
-        "</title>\n</head>\n<body>\n<PRE>\n<h1>" + fileName + "</h1>\n" +
+        "</title>\n</head>\n<body>\n<h1>" + fileName + "</h1>\n<PRE>" +
         body + "</PRE>\n</body>\n</html>\n";
 }
 
@@ -280,8 +260,19 @@ int main()
     string htmlString = prep_string_as_html(alteredFileString, htmlName);
 
     // 5) Outputs the modified file as an html file
-    upload_string_as_html(htmlString, htmlName, validPath);
+    int uploadResult = upload_string_as_html(htmlString, htmlName, validPath);
+    if (uploadResult == -1)
+    {
+        cout << "Error opening file." << endl;
+        return -1;
+    }
+    if (uploadResult == -2)
+    {
+        cout << "Error closing file." << endl;
+        return -2;
+    }
 
     //Close file being read from
     file.close();
+    return 0;
 }
