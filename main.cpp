@@ -3,6 +3,7 @@
 #include <string>
 #include <filesystem>
 #include <regex>
+#include <stdexcept>
 
 //FROM CLASSROOM REQUIREMENTS
 // 1) Implements file name & path validation on either the input file (.cpp) or output file (.html): DONE
@@ -109,32 +110,14 @@ static string get_valid_directory()
 //========================================================================================
 //Correct input/output: 'output.html','CppFile.html','Hello.html'
 //Incorrect input: '.html', '$%#.html', '14.html'
-static bool is_html_string(string fileName)
+static bool is_html_string(const string& fileName)
 {
     static const regex htmlRegex(R"re(^[A-Za-z_][A-Za-z0-9_]*\.html$)re");
 
-    try
-    {
-        if (fileName == "") { throw invalid_argument("Name is empty"); }
-
-        if (fileName.length() >= 250) { throw invalid_argument("Name too long"); };
-    }
-    catch (invalid_argument& e)
-    {
-        cout << "Invalid argument: " << e.what() << endl;
-        return false;
-    }
-
-    try
-    {
-        if (!regex_match(fileName, htmlRegex)) { throw invalid_argument("Name is not a valid html name"); }
-        return true;
-    }
-    catch (invalid_argument& e)
-    {
-        cout << "Invalid argument: " << e.what() << endl;
-        return false;
-    }
+    if (fileName.empty())         { cout << "Name is empty\n"; return false; }
+    if (fileName.length() >= 250) { cout << "Name too long\n"; return false; }
+    if (!regex_match(fileName, htmlRegex)) { cout << "Name is not a valid html name\n"; return false; }
+    return true;
 }
 
 static bool is_existing_html(const string& fileName, const string& directory)
@@ -289,11 +272,10 @@ int main()
 
     // 5) Outputs the modified file as an html file
     UploadResult result = upload_string_as_html(htmlString, htmlName, validPath);
-
-    //
     if (result != UploadResult::Success)
     {
-
+        cout << describe_upload_result(result) << endl;
+        return -1;
     }
 
     return 0;
