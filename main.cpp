@@ -43,9 +43,21 @@ static bool is_windows_directory(const string& path)
     static const regex windowsDirRegex(
         R"re(^[a-zA-Z]:\\(?:[^\\/:*?"<>|]+\\)*[^\\/:*?"<>|]*$)re"
     );
-    if (path.empty())          { cout << "Path is empty\n"; return false; }
-    if (path.length() >= 260)  { cout << "Path is too long\n"; return false; }
-    if (!regex_match(path, windowsDirRegex)) { cout << "Path is not a valid directory format\n"; return false; }
+    if (path.empty())
+    {
+        cout << "Path is empty\n";
+        return false;
+    }
+    if (path.length() >= 260)
+    {
+        cout << "Path is too long\n";
+        return false;
+    }
+    if (!regex_match(path, windowsDirRegex))
+    {
+        cout << "Path is not a valid directory format\n";
+        return false;
+    }
     return true;
 }
 
@@ -56,7 +68,11 @@ static bool is_exsisting_directory(const string& validPath)
 
     error_code ec;
     bool dirExsist = fs::exists(validPath, ec) && fs::is_directory(validPath, ec);
-    if (ec) {cout << "File System Error: " << ec.message() << endl; return false; }
+    if (ec)
+    {
+        cout << "File System Error: " << ec.message() << endl;
+        return false;
+    }
     if (dirExsist)
     {
         cout << "Directory exists: '" << validPath << "'\n";
@@ -162,28 +178,40 @@ static string get_html_name(string chosenDirectory)
 
 //========================================================================================
 
-// 5) Outputs the modified file as an html file
-static int upload_string_as_html(const string& htmlString, const string& fileName, const string& dirPath)
+enum class UploadResult
 {
-    //Construct full filepath
+    Success,
+    OpenFailed,
+    WriteFailed,
+    CloseFailed
+};
+
+static const char* describe_upload_result(UploadResult result)
+{
+    switch (result)
+    {
+    case UploadResult::OpenFailed:  return "Error opening output file.";
+    case UploadResult::WriteFailed: return "Error writing to output file.";
+    case UploadResult::CloseFailed: return "Error closing output file.";
+    default:                        return "";
+    }
+}
+
+// 5) Outputs the modified file as an html file
+static UploadResult upload_string_as_html(const string& htmlString, const string& fileName, const string& dirPath)
+{
     fs::path fullPath = fs::path(dirPath) / fileName;
 
-    //Creates and opens file
     ofstream outFile(fullPath);
-    if (!outFile)
-    {
-        return -1;
-    }
+    if (!outFile) { return UploadResult::OpenFailed; }
+
     outFile << htmlString << endl;
-    //Checks if the stream has failed (Failbit or bad)
-    if (outFile.fail())
-    {
-        return -1;
-    }
-    //Closes file
+    if (outFile.fail()) { return UploadResult::WriteFailed; }
+
     outFile.close();
-    if (!outFile.fail()){ return -2;}
-    return 0;
+    if (outFile.fail()) { return UploadResult::CloseFailed; }
+
+    return UploadResult::Success;
 }
 
 //Adds opening and closing "<PRE>" tags and html metadata to string
@@ -260,19 +288,13 @@ int main()
     string htmlString = prep_string_as_html(alteredFileString, htmlName);
 
     // 5) Outputs the modified file as an html file
-    int uploadResult = upload_string_as_html(htmlString, htmlName, validPath);
-    if (uploadResult == -1)
+    UploadResult result = upload_string_as_html(htmlString, htmlName, validPath);
+
+    //
+    if (result != UploadResult::Success)
     {
-        cout << "Error opening file." << endl;
-        return -1;
-    }
-    if (uploadResult == -2)
-    {
-        cout << "Error closing file." << endl;
-        return -2;
+
     }
 
-    //Close file being read from
-    file.close();
     return 0;
 }
