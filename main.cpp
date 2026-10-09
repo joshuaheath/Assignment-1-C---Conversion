@@ -42,7 +42,7 @@ namespace fs = std::filesystem;
 static bool is_windows_directory(const string& path)
 {
     static const regex windowsDirRegex(
-        R"re(^[a-zA-Z]:\\(?:[^\\/:*?"<>|]+\\)*[^\\/:*?"<>|]*$)re"
+        R"delim(^[a-zA-Z]:\\(?:[^\\/:*?"<>|]+\\)*[^\\/:*?"<>|]*$)delim"
     );
     if (path.empty())
     {
@@ -112,7 +112,7 @@ static string get_valid_directory()
 //Incorrect input: '.html', '$%#.html', '14.html'
 static bool is_html_string(const string& fileName)
 {
-    static const regex htmlRegex(R"re(^[A-Za-z_][A-Za-z0-9_]*\.html$)re");
+    static const regex htmlRegex(R"delim(^[A-Za-z_][A-Za-z0-9_]*\.html$)delim");
 
     if (fileName.empty())         { cout << "Name is empty\n"; return false; }
     if (fileName.length() >= 250) { cout << "Name too long\n"; return false; }
@@ -160,7 +160,7 @@ static string get_html_name(string chosenDirectory)
 }
 
 //========================================================================================
-
+// ENUM SOURCE:https://www.geeksforgeeks.org/cpp/enumeration-in-cpp/
 enum class UploadResult
 {
     Success,
@@ -185,14 +185,17 @@ static UploadResult upload_string_as_html(const string& htmlString, const string
 {
     fs::path fullPath = fs::path(dirPath) / fileName;
 
-    ofstream outFile(fullPath);
-    if (!outFile) { return UploadResult::OpenFailed; }
+    //Creates and opens file using 'fullPath'
+    ofstream writingFile(fullPath);
+    if (!writingFile) { return UploadResult::OpenFailed; }
 
-    outFile << htmlString << endl;
-    if (outFile.fail()) { return UploadResult::WriteFailed; }
+    //writes htmlString to opened file
+    writingFile << htmlString << endl;
+    if (writingFile.fail()) { return UploadResult::WriteFailed; }
 
-    outFile.close();
-    if (outFile.fail()) { return UploadResult::CloseFailed; }
+    //Closes file
+    writingFile.close();
+    if (writingFile.fail()) { return UploadResult::CloseFailed; }
 
     return UploadResult::Success;
 }
