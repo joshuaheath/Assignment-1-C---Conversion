@@ -1,24 +1,31 @@
-﻿#include <iostream>
-#include <fstream>
-#include <string>
-#include <filesystem>
-#include <regex>
+<!DOCTYPE html>
+<html>
+<head>
+<title>test.html</title>
+</head>
+<body>
+<PRE>
+<h1>test.html</h1>﻿#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;string&gt;
+#include &lt;filesystem&gt;
+#include &lt;regex&gt;
 
 //FROM CLASSROOM REQUIREMENTS
 // 1) Implements file name & path validation on either the input file (.cpp) or output file (.html) DONE
 // 2) Reads in a C++ source file (.cpp) DONE
-// 3) Converts all < symbols to &lt and all > symbols to &gt; DONE
-// 4) Inserts the <PRE> and </PRE> tags to the front and end of the html file respectively. DONE
+// 3) Converts all &lt; symbols to &lt and all &gt; symbols to &gt; DONE
+// 4) Inserts the &lt;PRE&gt; and &lt;/PRE&gt; tags to the front and end of the html file respectively. DONE
 // 5) Outputs the modified file as an html file DONE
 
 //OTHER REQUIREMENTS
 // 1) Asks user for a directory to output to: DONE
 // 2) Verifies Directory: DONE
-// 3) Asks user for html file name: DONE
-// 4) Verifies html file name: DONE
+// 3) Asks user for html file name
+// 4) Verifies html file name
 // 5) uses fin.fail and fout.fail: DONE
 // 6) properly formats Html heading for display reasons: DONE
-// 7) Asks user for name of CPP file being read: I was too tierd
+// 7) Asks user for name of CPP file being read
 // 8) Creates html file in specified directory: DONE
 // 9) Makes sure there is no file with same name
 
@@ -42,18 +49,18 @@ namespace fs = std::filesystem;
 static bool is_windows_dir(const std::string& path)
 {
     static const regex windowsDirRegex(
-        R"re(^[a-zA-Z]:\\(?:[^\\/:*?"<>|]+\\)*[^\\/:*?"<>|]*$)re"
+        R"re(^[a-zA-Z]:\\(?:[^\\/:*?"&lt;&gt;|]+\\)*[^\\/:*?"&lt;&gt;|]*$)re"
     );
     //Early Return
     try
     {
         if (path == "") { throw invalid_argument("path is empty"); }
 
-        if (path.length() >= 260) { throw invalid_argument("path is too long"); };
+        if (path.length() &gt;= 260) { throw invalid_argument("path is too long"); };
     }
     catch (invalid_argument& e)
     {
-        cout << "Invalid argument: " << e.what() << endl;
+        cout &lt;&lt; "Invalid argument: " &lt;&lt; e.what() &lt;&lt; endl;
         return false;
     }
 
@@ -64,21 +71,20 @@ static bool is_windows_dir(const std::string& path)
     }
     catch (invalid_argument& e)
     {
-        cout << "Invalid argument: " << e.what() << endl;
+        cout &lt;&lt; "Invalid argument: " &lt;&lt; e.what() &lt;&lt; endl;
         return false;
     }
 }
 
-//Returns bool depending on if the path given is an existing one on the computer
 static bool is_exsisting_directory(const string& validPath)
 {
-    cout << "\n=======================================================\n";
+    cout &lt;&lt; "\n=======================================================\n";
     if (filesystem::exists(validPath) && filesystem::is_directory(validPath))
     {
-        cout << "Directory exists: " << validPath << endl;
+        cout &lt;&lt; "Directory exists: " &lt;&lt; validPath &lt;&lt; endl;
         return true;
     }
-    cout << "'" << validPath << "' is not an existing directory, Try again" << endl;
+    cout &lt;&lt; "'" &lt;&lt; validPath &lt;&lt; "' is not an existing directory, Try again" &lt;&lt; endl;
     return false;
 }
 
@@ -91,16 +97,16 @@ static string get_valid_directory()
 
     while (!userInputValid)
     {
-        cout << "\n=======================================================\n";
-        cout << "Expected directory format: "
+        cout &lt;&lt; "\n=======================================================\n";
+        cout &lt;&lt; "Expected directory format: "
             "\n - \t C:\\"
             "\n - \t D:\\downloads"
             "\n - \t C:\\users\\me\\documents\n";
-        cout << "Please enter a valid directory: ";
+        cout &lt;&lt; "Please enter a valid directory: ";
         getline(cin, userInput);
         if (is_windows_dir(userInput))
         {
-            cout << "checking if '" << userInput << "' exists " << endl;
+            cout &lt;&lt; "checking if '" &lt;&lt; userInput &lt;&lt; "' exists " &lt;&lt; endl;
             userInputValid = is_exsisting_directory(userInput);
         }
     }
@@ -118,11 +124,11 @@ static bool is_html_string(string fileName)
     {
         if (fileName == "") { throw invalid_argument("Name is empty"); }
 
-        if (fileName.length() >= 260) { throw invalid_argument("Name too long"); };
+        if (fileName.length() &gt;= 260) { throw invalid_argument("Name too long"); };
     }
     catch (invalid_argument& e)
     {
-        cout << "Invalid argument: " << e.what() << endl;
+        cout &lt;&lt; "Invalid argument: " &lt;&lt; e.what() &lt;&lt; endl;
         return false;
     }
 
@@ -133,7 +139,7 @@ static bool is_html_string(string fileName)
     }
     catch (invalid_argument& e)
     {
-        cout << "Invalid argument: " << e.what() << endl;
+        cout &lt;&lt; "Invalid argument: " &lt;&lt; e.what() &lt;&lt; endl;
         return false;
     }
 }
@@ -143,7 +149,7 @@ static bool is_existing_html(const string& fileName, const string& directory)
     fs::path fullPath = fs::path(directory) / fileName;
     if (fs::exists(fullPath))
     {
-        cout << "File already exists: " << fileName << ", try again\n";
+        cout &lt;&lt; "File already exists: " &lt;&lt; fileName &lt;&lt; ", try again\n";
         return true;
     }
     return false;
@@ -159,16 +165,16 @@ static string get_html_name(string chosenDirectory)
 
     while (!userInputValid)
     {
-        cout << "\n=======================================================\n";
-        cout << "Expected file name format: "
+        cout &lt;&lt; "\n=======================================================\n";
+        cout &lt;&lt; "Expected file name format: "
             "\n - \t output.html"
             "\n - \t CppFile.html"
             "\n - \t Hello.html\n";
-        cout << "Please enter a valid html file name: ";
+        cout &lt;&lt; "Please enter a valid html file name: ";
         getline(cin, userInput);
         if (is_html_string(userInput))
         {
-            cout << "checking if '" << userInput << "' already exists" << endl;
+            cout &lt;&lt; "checking if '" &lt;&lt; userInput &lt;&lt; "' already exists" &lt;&lt; endl;
             if (!is_existing_html(userInput, chosenDirectory))
             {
                 userInputValid = true;
@@ -190,31 +196,29 @@ static int upload_string_as_html(const string& htmlString, const string& fileNam
     ofstream outFile(fullPath);
     if (!outFile)
     {
-        cout << "Unable to open file for writing." << endl;
+        cout &lt;&lt; "Unable to open file for writing." &lt;&lt; endl;
         return -1;
     }
-    outFile << htmlString << endl;
+    outFile &lt;&lt; htmlString &lt;&lt; endl;
     //Checks if the stream has failed (Failbit or bad)
     if (outFile.fail())
     {
-        cout << "Error writing to file or bad stream" << endl;
+        cout &lt;&lt; "Error writing to file or bad stream" &lt;&lt; endl;
         return -1;
     }
-    //Closes file
     outFile.close();
-    cout << "File uploaded successfully." << endl;
     return 0;
 }
 
-//Adds opening and closing "<PRE>" tags and html metadata to string
+//Adds opening and closing "&lt;PRE&gt;" tags and html metadata to string
 static string prep_string_as_html(const string& body, const string& fileName)
 {
-    return "<!DOCTYPE html>\n<html>\n<head>\n<title>" + fileName +
-        "</title>\n</head>\n<body>\n<PRE>\n<h1>" + fileName + "</h1>\n" +
-        body + "</PRE>\n</body>\n</html>\n";
+    return "&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;head&gt;\n&lt;title&gt;" + fileName +
+        "&lt;/title&gt;\n&lt;/head&gt;\n&lt;body&gt;\n&lt;PRE&gt;\n&lt;h1&gt;" + fileName + "&lt;/h1&gt;" +
+        body + "&lt;/PRE&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n";
 }
 
-//Replaces the "<" and ">" symbol
+//Replaces the "&lt;" and "&gt;" symbol
 static string alter_cpp_for_html(ifstream& file)
 {
     string line, result;
@@ -224,8 +228,8 @@ static string alter_cpp_for_html(ifstream& file)
         //checks each character in line and adds
         for (const char c : line)
         {
-            if (c == '<') result += "&lt;";
-            else if (c == '>') result += "&gt;";
+            if (c == '&lt;') result += "&lt;";
+            else if (c == '&gt;') result += "&gt;";
             else result += c;
         }
         //Maintains each line
@@ -241,47 +245,35 @@ static ifstream get_file(const string& readFilePath)
     ifstream readFile(readFilePath);
     if (!readFile.is_open())
     {
-        cout << "Error opening file\n";
+        cout &lt;&lt; "Error opening file\n";
         return ifstream("");
     }
     return readFile;
 }
 
-//========================================================================================
-
 int main()
 {
-    //What cpp file we are translating
-    const string readFilePath = "../OriginalCPP.cpp";
+    const string fileName = "test.html";
+    const string readFilePath = "../main.cpp";
 
-    //get directory to populate
     string validPath = get_valid_directory();
+    cout &lt;&lt; validPath &lt;&lt; endl;
 
-    //get name for html file
     string htmlName = get_html_name(validPath);
+    cout &lt;&lt; htmlName &lt;&lt; endl;
 
+    //What cpp file we are translating
     ifstream file = get_file(readFilePath);
-
-    if (!file.is_open())
-    {
-        cout << "Unable to open file for writing." << endl;
-        return -1;
-    }
-    //Checks if the stream has failed (Fail bit or bad bit)
     if (file.fail())
     {
-        cout << "Error writing to file or bad stream" << endl;
+        cout &lt;&lt; "Error opening file\n";
         return -1;
     }
-    //4) Inserts the <PRE> and </PRE> tags to the front and end of the html file respectively.
     string alteredFileString = alter_cpp_for_html(file);
-
-    //6) properly formats Html heading for display reasons:
     string htmlString = prep_string_as_html(alteredFileString, htmlName);
-
-    // 5) Outputs the modified file as an html file
     upload_string_as_html(htmlString, htmlName, validPath);
-
-    //Close file being read from
-    file.close();
 }
+</PRE>
+</body>
+</html>
+
