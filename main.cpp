@@ -41,24 +41,13 @@ namespace fs = std::filesystem;
  */
 static bool is_windows_directory(const string& path)
 {
+    //SOURCE: https://quickref.me/regex.html
     static const regex windowsDirRegex(
         R"delim(^[a-zA-Z]:\\(?:[^\\/:*?"<>|]+\\)*[^\\/:*?"<>|]*$)delim"
     );
-    if (path.empty())
-    {
-        cout << "Path is empty\n";
-        return false;
-    }
-    if (path.length() >= 260)
-    {
-        cout << "Path is too long\n";
-        return false;
-    }
-    if (!regex_match(path, windowsDirRegex))
-    {
-        cout << "Path is not a valid directory format\n";
-        return false;
-    }
+    if (path.empty())           { cout << "Path is empty\n"; return false; }
+    if (path.length() >= 260)   { cout << "Path is too long\n"; return false; }
+    if (!regex_match(path, windowsDirRegex)) { cout << "Path is not a valid directory format\n"; return false; }
     return true;
 }
 
@@ -112,6 +101,7 @@ static string get_valid_directory()
 //Incorrect input: '.html', '$%#.html', '14.html'
 static bool is_html_string(const string& fileName)
 {
+    //SOURCE https://stackoverflow.com/questions/6768779/test-filename-with-regular-expression
     static const regex htmlRegex(R"delim(^[A-Za-z_][A-Za-z0-9_]*\.html$)delim");
 
     if (fileName.empty())         { cout << "Name is empty\n"; return false; }
@@ -243,43 +233,38 @@ static ifstream get_file(const string& readFilePath)
 
 //========================================================================================
 
-int main()
+static int run()
 {
-    //What cpp file we are translating
     const string readFilePath = "../OriginalCPP.cpp";
 
-    //get directory to populate
     string validPath = get_valid_directory();
-
-    //get name for html file
-    string htmlName = get_html_name(validPath);
+    string htmlName  = get_html_name(validPath);
 
     ifstream file = get_file(readFilePath);
+    if (!file.fail()) { return 1; }
 
-    if (!file.is_open())
-    {
-        cout << "Unable to open file for writing." << endl;
-        return -1;
-    }
-    //Checks if the stream has failed (Fail bit or bad bit)
-    if (file.fail())
-    {
-        cout << "Error writing to file or bad stream" << endl;
-        return -1;
-    }
-    //4) Inserts the <PRE> and </PRE> tags to the front and end of the html file respectively.
     string alteredFileString = alter_cpp_for_html(file);
+    string htmlString        = prep_string_as_html(alteredFileString, htmlName);
 
-    //6) properly formats Html heading for display reasons:
-    string htmlString = prep_string_as_html(alteredFileString, htmlName);
-
-    // 5) Outputs the modified file as an html file
     UploadResult result = upload_string_as_html(htmlString, htmlName, validPath);
     if (result != UploadResult::Success)
     {
         cout << describe_upload_result(result) << endl;
-        return -1;
+        return 1;
     }
 
+    cout << "File uploaded successfully." << endl;
     return 0;
+}
+int main()
+{
+    try
+    {
+        return run();
+    }
+    catch (const exception& e)
+    {
+        cout << e.what() << endl;
+        return 1;
+    }
 }
