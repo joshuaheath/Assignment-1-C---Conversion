@@ -5,11 +5,11 @@
 #include <regex>
 
 //FROM CLASSROOM REQUIREMENTS
-// 1) Implements file name & path validation on either the input file (.cpp) or output file (.html) DONE
-// 2) Reads in a C++ source file (.cpp) DONE
-// 3) Converts all < symbols to &lt and all > symbols to &gt; DONE
-// 4) Inserts the <PRE> and </PRE> tags to the front and end of the html file respectively. DONE
-// 5) Outputs the modified file as an html file DONE
+// 1) Implements file name & path validation on either the input file (.cpp) or output file (.html): DONE
+// 2) Reads in a C++ source file (.cpp): DONE
+// 3) Converts all < symbols to &lt and all > symbols to &gt;: DONE
+// 4) Inserts the <PRE> and </PRE> tags to the front and end of the html file respectively.: DONE
+// 5) Outputs the modified file as an html file: DONE
 
 //OTHER REQUIREMENTS
 // 1) Asks user for a directory to output to: DONE
@@ -20,7 +20,7 @@
 // 6) properly formats Html heading for display reasons: DONE
 // 7) Asks user for name of CPP file being read: I was too tierd
 // 8) Creates html file in specified directory: DONE
-// 9) Makes sure there is no file with same name
+// 9) Makes sure there is no file with same name: DONE
 
 //Upload string as HTML in given directory, returns error code
 using namespace std;
