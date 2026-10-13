@@ -23,6 +23,19 @@
 // 8) Creates html file in specified directory: DONE
 // 9) Makes sure there is no file with same name: DONE
 
+class MyCustomException : public std::runtime_error
+{
+public: std::string message;
+public:
+    explicit MyCustomException(std::string message) : std::runtime_error(message){}
+    const char * what() const noexcept override
+    {
+        return message.c_str();
+    }
+};
+using namespace std;
+namespace fs = std::filesystem;
+
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -241,9 +254,10 @@ static int run()
     string htmlName  = get_html_name(validPath);
 
     ifstream file = get_file(readFilePath);
-    if (!file.fail()) { return 1; }
+    if (file.fail()) { return 1; }
 
     string alteredFileString = alter_cpp_for_html(file);
+    file.close();
     string htmlString        = prep_string_as_html(alteredFileString, htmlName);
 
     UploadResult result = upload_string_as_html(htmlString, htmlName, validPath);
@@ -260,11 +274,20 @@ int main()
 {
     try
     {
-        return run();
+        if (run() != 0)
+        {
+            throw MyCustomException("Error running main");
+        }
+        return 0;
     }
-    catch (const exception& e)
+    catch (MyCustomException& e)
     {
         cout << e.what() << endl;
         return 1;
     }
+    catch (const exception& e)
+    {
+        cout << e.what() << endl;
+    }
 }
+
