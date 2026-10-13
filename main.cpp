@@ -5,9 +5,18 @@
 #include <regex>
 #include <stdexcept>
 
+class MyCustomException : public std::runtime_error
+{
+public: std::string message;
+public:
+    explicit MyCustomException(std::string message) : std::runtime_error(message){}
+    const char * what() const noexcept override
+    {
+        return message.c_str();
+    }
+};
 using namespace std;
 namespace fs = std::filesystem;
-
 //========================================================================================
 
 static bool is_windows_directory(const string& path)
@@ -198,6 +207,7 @@ static int run()
     if (file.fail()) { return 1; }
 
     string alteredFileString = alter_cpp_for_html(file);
+    file.close();
     string htmlString        = prep_string_as_html(alteredFileString, htmlName);
 
     UploadResult result = upload_string_as_html(htmlString, htmlName, validPath);
@@ -214,11 +224,19 @@ int main()
 {
     try
     {
-        return run();
+        if (run() != 0)
+        {
+            throw MyCustomException("Error running main");
+        }
+        return 0;
+    }
+    catch (MyCustomException& e)
+    {
+        cout << e.what() << endl;
+        return 1;
     }
     catch (const exception& e)
     {
         cout << e.what() << endl;
-        return 1;
     }
 }
