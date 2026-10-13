@@ -5,24 +5,6 @@
 #include <regex>
 #include <stdexcept>
 
-//FROM CLASSROOM REQUIREMENTS
-// 1) Implements file name & path validation on either the input file (.cpp) or output file (.html): DONE
-// 2) Reads in a C++ source file (.cpp): DONE
-// 3) Converts all < symbols to &lt and all > symbols to &gt;: DONE
-// 4) Inserts the <PRE> and </PRE> tags to the front and end of the html file respectively.: DONE
-// 5) Outputs the modified file as an html file: DONE
-
-//OTHER REQUIREMENTS
-// 1) Asks user for a directory to output to: DONE
-// 2) Verifies Directory: DONE
-// 3) Asks user for html file name: DONE
-// 4) Verifies html file name: DONE
-// 5) uses fin.fail and fout.fail: DONE
-// 6) properly formats Html heading for display reasons: DONE
-// 7) Asks user for name of CPP file being read
-// 8) Creates html file in specified directory: DONE
-// 9) Makes sure there is no file with same name: DONE
-
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -213,7 +195,7 @@ static int run()
     string htmlName  = get_html_name(validPath);
 
     ifstream file = get_file(readFilePath);
-    if (!file.fail()) { return 1; }
+    if (file.fail()) { return 1; }
 
     string alteredFileString = alter_cpp_for_html(file);
     string htmlString        = prep_string_as_html(alteredFileString, htmlName);
